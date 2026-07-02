@@ -1,0 +1,32 @@
+# === Gradle & Java ===
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+out/
+*.class
+*.jar
+!libs/*.jar
+
+# === Rust ===
+native/target/
+native/**/*.rs.bk
+Cargo.lock  # 对于 cdylib (动态库)，通常建议提交 Cargo.lock 以保证构建可重复性，但此处若作为库可忽略
+
+# === IDE ===
+.idea/
+*.iml
+.vscode/
+*.swp
+.project
+.classpath
+.settings/
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === 模组运行产物 ===
+run/
+logs/
+crash-reports/

@@ -1,0 +1,9 @@
+# 强制所有文本文件使用 LF 换行符，防止 Windows 开发者提交 CRLF 导致 Rust/Shell 脚本报错
+* text=auto eol=lf
+
+# 明确标记二进制文件，防止 Git 尝试 diff 它们
+*.dll binary
+*.so binary
+*.dylib binary
+*.jar binary
+*.png binary

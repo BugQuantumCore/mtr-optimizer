@@ -1,0 +1,17 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/repository/release/'
+        }
+        maven {
+            name = 'Quilt'
+            url = 'https://maven.quiltmc.org/repository/release/'
+        }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+// 定义根项目名称，这将决定最终生成的 jar 包的基础名称
+rootProject.name = 'mtr-optimizer'

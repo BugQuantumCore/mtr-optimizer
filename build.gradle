@@ -1,0 +1,124 @@
+plugins {
+	id 'net.fabricmc.fabric-loom-remap' version "1.9.2"
+	id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+loom {
+	splitEnvironmentSourceSets()
+
+	mods {
+		"mtr-optimizer" {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://maven.shedaniel.me/" } // Cloth Config
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    // 配置界面
+    modImplementation "me.shedaniel.cloth:cloth-config-fabric:11.1.118"
+}
+
+// ============================================================
+// Rust 原生库编译任务
+// ============================================================
+
+// 定义所有需要编译的目标平台
+def rustTargets = [
+    "x86_64-pc-windows-msvc",    // Windows 64-bit
+    "x86_64-unknown-linux-gnu",  // Linux glibc 64-bit
+    "aarch64-unknown-linux-gnu", // Linux ARM64
+    "x86_64-apple-darwin",       // macOS Intel
+    "aarch64-apple-darwin"       // macOS Apple Silicon
+]
+
+// 动态库在不同平台的文件名映射
+def getLibFileName(target) {
+    if (target.contains("windows")) return "mtr_optimizer.dll"
+    if (target.contains("apple")) return "libmtr_optimizer.dylib"
+    return "libmtr_optimizer.so" // Linux
+}
+
+// 为每个目标平台创建一个编译任务
+rustTargets.each { target ->
+    tasks.register("compileRust_${target.replace('-', '_')}", Exec) {
+        group = "rust"
+        description = "Compile Rust native library for ${target}"
+
+        workingDir = file("native")
+
+        // 根据操作系统选择 cargo 命令
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            commandLine "cmd", "/c", "cargo", "build", "--release", "--target", target
+        } else {
+            commandLine "cargo", "build", "--release", "--target", target
+        }
+    }
+}
+
+// 汇总任务：编译所有平台的原生库
+tasks.register("buildAllNative") {
+    group = "rust"
+    description = "Compile Rust native library for ALL target platforms"
+    dependsOn rustTargets.collect { "compileRust_${it.replace('-', '_')}" }
+}
+
+// 仅编译当前主机平台的原生库（用于本地开发测试）
+tasks.register("buildLocalNative", Exec) {
+    group = "rust"
+    description = "Compile Rust native library for the LOCAL host platform only"
+    workingDir = file("native")
+    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        commandLine "cmd", "/c", "cargo", "build", "--release"
+    } else {
+        commandLine "cargo", "build", "--release"
+    }
+}
+
+// ============================================================
+// 将原生库打包进 Jar
+// ============================================================
+
+// 在 processResources 阶段，将编译好的原生库复制到 jar 包的 native/ 目录下
+processResources {
+    // 确保先编译原生库
+    dependsOn "buildAllNative"
+
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+
+    // 遍历所有目标平台，将产物复制到资源目录
+    rustTargets.each { target ->
+        def libName = getLibFileName(target)
+        def srcPath = "native/target/${target}/release/${libName}"
+        def destPath = "native/${target}/${libName}"
+
+        from(srcPath) {
+            into destPath.substring(0, destPath.lastIndexOf('/'))
+        }
+    }
+}
+
+// 本地开发时，只打包当前平台的库以加快构建速度
+tasks.register("processLocalResources", Copy) {
+    dependsOn "buildLocalNative"
+    from("native/target/release/") {
+        include "*.dll", "*.so", "*.dylib"
+    }
+    into "build/resources/main/native/local"
+}
