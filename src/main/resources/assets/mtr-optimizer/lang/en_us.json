@@ -1,0 +1,17 @@
+{
+    "text.autoconfig.mtr-optimizer.title": "MTR Optimizer Settings",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching": "Enable VBO Geometry Caching",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching.@Tooltip[0]": "Cache rail and catenary data into VRAM (Video Memory).",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching.@Tooltip[1]": "Significantly reduces CPU load. Recommended to enable.",
+    "text.autoconfig.mtr-optimizer.option.enableGPUInstancing": "Enable Train GPU Instanced Rendering",
+    "text.autoconfig.mtr-optimizer.option.enableGPUInstancing.@Tooltip": "Merge Draw Call for trains of the same model, significant improvement for large stations.",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine": "Enable Native JS Engine (Rust)",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine.@Tooltip[0]": "Use QuickJS instead of the Java built-in script engine.",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine.@Tooltip[1]": "Accelerate PIDS sign dynamic texture generation. Automatically downgrade if loading fails.",
+    "text.autoconfig.mtr-optimizer.option.signUpdateThrottleTicks": "Sign Update Throttle (Tick)",
+    "text.autoconfig.mtr-optimizer.option.signUpdateThrottleTicks.@Tooltip": "How many ticks to allow the sign to redraw once. The larger the value, the better the performance, but the animation may stutter.(20 Ticks = 1 second)",
+    "text.autoconfig.mtr-optimizer.category.lod": "LOD (Level of Detail) Settings",
+    "text.autoconfig.mtr-optimizer.option.lod.enableLOD": "Enable LOD",
+    "text.autoconfig.mtr-optimizer.option.lod.fullDetailDistance": "Full Detail Render Distance",
+    "text.autoconfig.mtr-optimizer.option.lod.billboardDistance": "Billboard Render Distance"
+}

@@ -1,0 +1,81 @@
+name: Build MTR Optimizer
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-native:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: mtr_optimizer.dll
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: libmtr_optimizer.so
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact: libmtr_optimizer.dylib
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: libmtr_optimizer.dylib
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build Rust Native Library
+        working-directory: ./native
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Upload Native Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.target }}
+          path: native/target/${{ matrix.target }}/release/${{ matrix.artifact }}
+
+  build-mod:
+    needs: build-native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 下载所有平台的原生库
+      - name: Download all native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: native-downloads/
+
+      # 将原生库移动到正确的资源目录
+      - name: Organize native libraries
+        run: |
+          mkdir -p src/main/resources/native
+          # 遍历下载的产物并复制到资源目录
+          # (具体路径根据 artifact 结构调整)
+          cp native-downloads/native-x86_64-pc-windows-msvc/* src/main/resources/native/x86_64-pc-windows-msvc/ || true
+          cp native-downloads/native-x86_64-unknown-linux-gnu/* src/main/resources/native/x86_64-unknown-linux-gnu/ || true
+          # ... 其他平台
+
+      - name: Build Fabric Mod Jar
+        run: ./gradlew build -x buildAllNative  # 跳过本地 Rust 编译，使用下载的产物
+
+      - name: Upload Final Mod Jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: mtr-optimizer-mod
+          path: build/libs/*.jar

@@ -1,0 +1,46 @@
+name: Performance Issue (性能问题)
+description: Report FPS drops, stuttering, or high resource usage.
+labels: ["performance", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a performance issue! Please provide as much detail as possible.
+  - type: input
+    id: mod-version
+    attributes:
+      label: MTR Optimizer Version
+      placeholder: e.g., 1.0.0-alpha-1
+    validations:
+      required: true
+  - type: input
+    id: mtr-version
+    attributes:
+      label: MTR & Addons Versions
+      placeholder: e.g., MTR 4.0.5, JCM 2.2.3, MSD 1.4.5, Tianjin Metro 1.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Hardware Specs
+      description: CPU, GPU, RAM, and OS.
+      placeholder: |
+        CPU: Intel Core i7-13700K
+        GPU: RTX 4080 16GB
+        RAM: 64GB DDR5
+        OS: Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario Description
+      description: Where and when does the lag happen? (e.g., "Looking at the central station with 10 trains moving")
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs & Profiling
+      description: Please upload `latest.log`. If possible, attach a Spark profiler link (`/spark profiler --timeout 60`).

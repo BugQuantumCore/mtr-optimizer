@@ -1,0 +1,59 @@
+name: Release and Publish
+
+on:
+  push:
+    tags:
+      - 'v*' # 当推送 v1.0.0 这样的 tag 时触发
+
+jobs:
+  build-native:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Build Rust
+        working-directory: ./native
+        run: cargo build --release --target ${{ matrix.target }}
+      - name: Upload Native
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.target }}
+          path: native/target/${{ matrix.target }}/release/*mtr_optimizer.*
+
+  build-and-publish:
+    needs: build-native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 下载所有 Rust产物并放入资源目录
+      - uses: actions/download-artifact@v4
+        with:
+          path: src/main/resources/native/
+          merge-multiple: true
+
+      - name: Build Mod Jar
+        run: ./gradlew build -x buildAllNative
+
+      # 自动发布到 GitHub Releases
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/libs/*.jar

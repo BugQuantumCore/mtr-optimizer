@@ -1,10 +1,10 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "1.9.2"
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
 }
 
-version = project.mod_version
-group = project.maven_group
+version = mod_version
+group = maven_group
 
 loom {
 	splitEnvironmentSourceSets()

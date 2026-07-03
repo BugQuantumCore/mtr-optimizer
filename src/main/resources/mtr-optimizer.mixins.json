@@ -1,0 +1,15 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.mtr_optimizer.mixin",
+    "compatibilityLevel": "JAVA_17",
+    "client": [
+        "BufferBuilderMixin",
+        "TrainEntityRendererMixin",
+        "SignRendererMixin",
+        "WorldRendererMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 0
+    }
+}

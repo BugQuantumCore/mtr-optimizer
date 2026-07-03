@@ -1,0 +1,17 @@
+{
+    "text.autoconfig.mtr-optimizer.title": "Configuration de MTR Optimizer",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching": "Activer le cache de géométrie VBO",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching.@Tooltip[0]": "Met en cache les données de voies et de caténaires dans la VRAM.",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching.@Tooltip[1]": "Réduit considérablement la charge du CPU. Activation recommandée.",
+    "text.autoconfig.mtr-optimizer.option.enableGPUInstancing": "Activer le rendu par instanciation GPU des trains",
+    "text.autoconfig.mtr-optimizer.option.enableGPUInstancing.@Tooltip": "Fusionne les appels de dessin pour les trains du même modèle. Amélioration significative pour les grandes gares.",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine": "Activer le moteur JS natif (Rust)",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine.@Tooltip[0]": "Utiliser QuickJS à la place du moteur de script intégré de Java.",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine.@Tooltip[1]": "Accélère la génération de textures dynamiques pour les panneaux PIDS. Repli automatique en cas d'échec de chargement.",
+    "text.autoconfig.mtr-optimizer.option.signUpdateThrottleTicks": "Limitation de la mise à jour des panneaux (Ticks)",
+    "text.autoconfig.mtr-optimizer.option.signUpdateThrottleTicks.@Tooltip": "Nombre de ticks entre chaque rafraîchissement autorisé des panneaux. Des valeurs plus élevées améliorent les performances, mais les animations peuvent saccader. (20 Ticks = 1 seconde)",
+    "text.autoconfig.mtr-optimizer.category.lod": "Paramètres de LOD (Niveau de détail)",
+    "text.autoconfig.mtr-optimizer.option.lod.enableLOD": "Activer le LOD",
+    "text.autoconfig.mtr-optimizer.option.lod.fullDetailDistance": "Distance de rendu en détail complet",
+    "text.autoconfig.mtr-optimizer.option.lod.billboardDistance": "Distance de rendu des billboards croisés"
+}

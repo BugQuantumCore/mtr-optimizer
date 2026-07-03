@@ -1,0 +1,17 @@
+{
+    "text.autoconfig.mtr-optimizer.title": "Minecraft Transit Railway 渲染最佳化設定",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching": "啟用 VBO 幾何體快取",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching.@Tooltip[0]": "將軌道和架空線資料快取至顯示記憶體。",
+    "text.autoconfig.mtr-optimizer.option.enableVBOCaching.@Tooltip[1]": "可大幅降低 CPU 負載，建議開啟。",
+    "text.autoconfig.mtr-optimizer.option.enableGPUInstancing": "啟用列車 GPU 實例化渲染",
+    "text.autoconfig.mtr-optimizer.option.enableGPUInstancing.@Tooltip": "合併同型號列車的 Draw Call，對大型車站有顯著提升。",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine": "啟用原生 JS 引擎 (Rust)",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine.@Tooltip[0]": "使用 QuickJS 取代 Java 內建指令碼引擎。",
+    "text.autoconfig.mtr-optimizer.option.enableNativeJSEngine.@Tooltip[1]": "加速 PIDS 指示牌動態材質生成。若載入失敗將自動降級。",
+    "text.autoconfig.mtr-optimizer.option.signUpdateThrottleTicks": "指示牌更新節流 (Tick)",
+    "text.autoconfig.mtr-optimizer.option.signUpdateThrottleTicks.@Tooltip": "每隔多少 Tick 允許指示牌重繪一次。數值越大效能越好，但動畫可能會卡頓。(20 Ticks = 1 秒)",
+    "text.autoconfig.mtr-optimizer.category.lod": "LOD (細節層次) 設定",
+    "text.autoconfig.mtr-optimizer.option.lod.enableLOD": "啟用 LOD",
+    "text.autoconfig.mtr-optimizer.option.lod.fullDetailDistance": "全細節渲染距離",
+    "text.autoconfig.mtr-optimizer.option.lod.billboardDistance": "十字面片渲染距離"
+}
