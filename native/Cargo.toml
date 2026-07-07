@@ -4,18 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib"]  # 编译为动态链接库 (.so/.dll/.dylib)
+crate-type = ["cdylib"]
 
 [dependencies]
-jni = "0.21"              # JNI 桥接
-quick-js = "0.4"          # QuickJS JavaScript 引擎
-wide = "0.7"              # SIMD 向量运算
-lazy_static = "1.4"
-image = "0.25"            # 图像处理（纹理图集构建）
+jni = "0.21.1"
+lazy_static = "1.5.0"
+image = "0.25.1"
+boa_engine = "0.19"
+boa_runtime = "0.19"
 
 [profile.release]
 opt-level = 3
-lto = true                # Link-Time Optimization
-codegen-units = 1         # 单编译单元，最大化优化
-strip = true              # 去除调试符号
-panic = "abort"           # 减小二进制大小
+lto = true
+codegen-units = 1
+strip = true

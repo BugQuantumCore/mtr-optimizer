@@ -1,10 +1,7 @@
-use jni::objects::{JByteArray, JClass, JIntArray};
-use jni::sys::{jboolean, jint, JNI_FALSE, JNI_TRUE};
 use jni::JNIEnv;
-use rectpack::{Packer, PackerConfig, Rect};
+use jni::objects::{JClass, JIntArray};
+use jni::sys::{jint, jboolean, JNI_TRUE, JNI_FALSE};
 
-/// 将多个小纹理打包到一个大 Atlas 中
-/// 返回每个小纹理在 Atlas 中的 (x, y) 坐标偏移量
 #[no_mangle]
 pub extern "C" fn Java_com_mtr_1optimizer_native_1bridge_NativeJSRunner_packTextures(
     mut env: JNIEnv,
@@ -13,40 +10,58 @@ pub extern "C" fn Java_com_mtr_1optimizer_native_1bridge_NativeJSRunner_packText
     heights: JIntArray,
     atlas_width: jint,
     atlas_height: jint,
-    out_coords: JIntArray, // 输出数组，长度为 count * 2 (x, y 交替)
+    out_coords: JIntArray,
 ) -> jboolean {
     let count = env.get_array_length(&widths).unwrap() as usize;
-
+    if count == 0 {
+        return JNI_TRUE;
+    }
+    
     let mut w_vec = vec![0; count];
     let mut h_vec = vec![0; count];
-    env.get_int_array_region(&widths, 0, &mut w_vec).unwrap();
-    env.get_int_array_region(&heights, 0, &mut h_vec).unwrap();
-
-    // 配置矩形打包器
-    let config = PackerConfig {
-        width: atlas_width as u32,
-        height: atlas_height as u32,
-        ..Default::default()
-    };
-    let mut packer = Packer::new(config);
-
-    let mut rects: Vec<Rect> = (0..count)
-        .map(|i| Rect::new(w_vec[i] as u32, h_vec[i] as u32, i as u32))
-        .collect();
-
-    // 执行打包
-    if packer.pack(&mut rects).is_err() {
-        return JNI_FALSE; // 空间不足，打包失败
+    
+    if env.get_int_array_region(&widths, 0, &mut w_vec).is_err() ||
+       env.get_int_array_region(&heights, 0, &mut h_vec).is_err() {
+        return JNI_FALSE;
     }
 
-    // 提取结果坐标
+    let max_w = atlas_width as u32;
+    let max_h = atlas_height as u32;
+
+    // 简单的 Shelf (货架) 矩形打包算法
+    let mut cursor_x: u32 = 0;
+    let mut cursor_y: u32 = 0;
+    let mut shelf_height: u32 = 0;
     let mut out_vec = vec![0; count * 2];
-    for rect in rects {
-        let idx = rect.id as usize;
-        out_vec[idx * 2] = rect.x as i32;
-        out_vec[idx * 2 + 1] = rect.y as i32;
+
+    for i in 0..count {
+        let w = w_vec[i] as u32;
+        let h = h_vec[i] as u32;
+
+        // 如果当前行放不下，换行
+        if cursor_x + w > max_w {
+            cursor_x = 0;
+            cursor_y += shelf_height;
+            shelf_height = 0;
+        }
+
+        // 如果垂直方向也超出了，说明 Atlas 空间不足
+        if cursor_y + h > max_h {
+            return JNI_FALSE; 
+        }
+
+        out_vec[i * 2] = cursor_x as i32;
+        out_vec[i * 2 + 1] = cursor_y as i32;
+
+        cursor_x += w;
+        if h > shelf_height {
+            shelf_height = h;
+        }
     }
 
-    env.set_int_array_region(&out_coords, 0, &out_vec).unwrap();
+    if env.set_int_array_region(&out_coords, 0, &out_vec).is_err() {
+        return JNI_FALSE;
+    }
+    
     JNI_TRUE
 }
