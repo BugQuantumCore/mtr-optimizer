@@ -1,6 +1,6 @@
 package com.mtr_optimizer.mixin;
 
-import com.mtr_optimizer.native.NativeJSRunner;
+import com.mtr_optimizer.nativebridge.NativeJSRunner;
 import com.mtr_optimizer.render.SignTextureCache;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * 拦截 MTR 的 SignRenderer / RouteSignRenderer
  * 在 MTR 4.0.5 中，指示牌渲染器位于:
- *   mtr.client.SignRenderer 或 mtr.client.StationNameSignRenderer
+ * mtr.client.SignRenderer 或 mtr.client.StationNameSignRenderer
  */
 @Pseudo
 @Mixin(targets = "mtr.client.StationNameSignRenderer", remap = false)
@@ -30,16 +30,17 @@ public abstract class SignRendererMixin {
     /**
      * 在指示牌渲染前拦截
      * 实现:
-     *   1. 脏标记：非关键帧跳过重绘
-     *   2. 节流：每 N tick 才允许执行 JS
-     *   3. 使用原生 QuickJS 替代 Java ScriptEngine
+     * 1. 脏标记：非关键帧跳过重绘
+     * 2. 节流：每 N tick 才允许执行 JS
+     * 3. 使用原生 QuickJS 替代 Java ScriptEngine
      */
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onSignRender(Entity entity, float tickDelta,
-                               MatrixStack matrices,
-                               VertexConsumerProvider vertexConsumers,
-                               int light, CallbackInfo ci) {
-        if (!NativeJSRunner.isAvailable()) return;
+            MatrixStack matrices,
+            VertexConsumerProvider vertexConsumers,
+            int light, CallbackInfo ci) {
+        if (!NativeJSRunner.isAvailable())
+            return;
 
         // 节流控制：每 5 tick（0.25秒）才允许重新渲染
         tickCounter++;
@@ -53,7 +54,7 @@ public abstract class SignRendererMixin {
         if (SignTextureCache.hasValidCache(entity.getUuid(), contentHash)) {
             // 直接使用缓存的纹理渲染，跳过 JS 执行
             SignTextureCache.renderCached(entity.getUuid(), matrices,
-                                           vertexConsumers, light);
+                    vertexConsumers, light);
             ci.cancel(); // 取消原版渲染
             return;
         }
@@ -62,7 +63,7 @@ public abstract class SignRendererMixin {
             // 在节流期间，如果缓存失效，渲染上一帧的旧纹理
             if (SignTextureCache.hasAnyCache(entity.getUuid())) {
                 SignTextureCache.renderCached(entity.getUuid(), matrices,
-                                               vertexConsumers, light);
+                        vertexConsumers, light);
                 ci.cancel();
             }
             return; // 否则让原版渲染（降级方案）
@@ -81,15 +82,14 @@ public abstract class SignRendererMixin {
         String paramsJson = buildParamsJson(entity, tickDelta);
 
         int result = NativeJSRunner.executeScript(
-            nativeJsContext, jsScript, paramsJson, width, height, pixels
-        );
+                nativeJsContext, jsScript, paramsJson, width, height, pixels);
 
         if (result > 0) {
             // 将像素数据上传为纹理并缓存
             SignTextureCache.updateCache(entity.getUuid(), contentHash,
-                                          pixels, width, height);
+                    pixels, width, height);
             SignTextureCache.renderCached(entity.getUuid(), matrices,
-                                           vertexConsumers, light);
+                    vertexConsumers, light);
             ci.cancel(); // 取消原版渲染
         }
     }

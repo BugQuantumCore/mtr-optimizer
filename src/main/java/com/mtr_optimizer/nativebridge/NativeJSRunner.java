@@ -1,4 +1,4 @@
-package com.mtr_optimizer.native;
+package com.mtr_optimizer.nativebridge;
 
 import java.io.*;
 import java.nio.file.*;
@@ -27,17 +27,24 @@ public class NativeJSRunner {
                 try {
                     Files.deleteIfExists(tempLib);
                     Files.deleteIfExists(tempDir);
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             }));
         } catch (Exception e) {
             System.err.println("[MTR-Optimizer] Failed to load native library: " + e.getMessage());
         }
     }
 
-    public static boolean isAvailable() { return loaded; }
+    public static boolean isAvailable() {
+        return loaded;
+    }
 
     // 原生方法声明
     public static native long createContext();
-    public static native int executeScript(long contextId, String script, String paramsJson, int width, int height, byte[] outputPixels);
-    public static native boolean buildAtlas(byte[] textureIds, byte[] pixelData, byte[] widths, byte[] heights, int count, byte[] outputAtlas, int atlasWidth, int atlasHeight);
+
+    public static native int executeScript(long contextId, String script, String paramsJson, int width, int height,
+            byte[] outputPixels);
+
+    public static native boolean buildAtlas(byte[] textureIds, byte[] pixelData, byte[] widths, byte[] heights,
+            int count, byte[] outputAtlas, int atlasWidth, int atlasHeight);
 }
