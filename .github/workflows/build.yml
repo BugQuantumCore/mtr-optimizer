@@ -44,8 +44,8 @@ jobs:
           path: native/target/${{ matrix.target }}/release/${{ matrix.artifact }}
 
   build-mod:
-    needs: build-native
     runs-on: ubuntu-latest
+    needs: build-native
     steps:
       - uses: actions/checkout@v4
 
@@ -55,26 +55,30 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 下载所有平台的原生库
-      - name: Download all native artifacts
+      - name: Download Native Libraries
         uses: actions/download-artifact@v4
         with:
           path: native-downloads/
 
-      # 将原生库移动到正确的资源目录
-      - name: Organize native libraries
+      - name: Prepare Native Libraries
         run: |
           mkdir -p src/main/resources/native
-          # 遍历下载的产物并复制到资源目录
-          # (具体路径根据 artifact 结构调整)
-          cp native-downloads/native-x86_64-pc-windows-msvc/* src/main/resources/native/x86_64-pc-windows-msvc/ || true
-          cp native-downloads/native-x86_64-unknown-linux-gnu/* src/main/resources/native/x86_64-unknown-linux-gnu/ || true
-          # ... 其他平台
+          
+          # 创建平台子目录并复制原生库
+          # 使用通配符和循环确保目录存在且复制正确
+          for dir in native-downloads/*/; do
+            platform=$(basename "$dir")
+            mkdir -p "src/main/resources/native/$platform"
+            cp -r "$dir"* "src/main/resources/native/$platform/" || true
+          done
 
-      - name: Build Fabric Mod Jar
-        run: ./gradlew build -x buildAllNative  # 跳过本地 Rust 编译，使用下载的产物
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      - name: Upload Final Mod Jar
+      - name: Build Fabric Jar
+        run: ./gradlew build -x buildAllNative
+
+      - name: Upload Mod Artifact
         uses: actions/upload-artifact@v4
         with:
           name: mtr-optimizer-mod
