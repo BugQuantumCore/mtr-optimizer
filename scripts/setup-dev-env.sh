@@ -23,7 +23,7 @@ rustup component add rustfmt clippy
 
 # 检查 Java
 if ! command -v javac &> /dev/null; then
-    echo "⚠️ Java JDK not found in PATH. Please install JDK 17."
+    echo "⚠️ Java JDK not found in PATH. Please install JDK 21."
 else
     echo "☕ Java version: $(javac -version)"
 fi

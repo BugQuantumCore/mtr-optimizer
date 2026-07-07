@@ -3,7 +3,7 @@
 Thank you for your interest in improving railway rendering performance!
 
 ## Prerequisites
-- JDK 17+
+- JDK 21+
 - Rust 1.75+ (Run `./scripts/setup-dev-env.sh` to configure targets)
 - Minecraft 1.20.1 Fabric Dev Environment
 

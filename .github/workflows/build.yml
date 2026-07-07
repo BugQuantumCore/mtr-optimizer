@@ -49,10 +49,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       - name: Download Native Libraries
@@ -63,7 +63,7 @@ jobs:
       - name: Prepare Native Libraries
         run: |
           mkdir -p src/main/resources/native
-          
+
           # 创建平台子目录并复制原生库
           # 使用通配符和循环确保目录存在且复制正确
           for dir in native-downloads/*/; do
