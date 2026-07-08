@@ -19,6 +19,7 @@ loom {
 repositories {
     mavenCentral()
     maven { url "https://maven.shedaniel.me/" } // Cloth Config
+		maven { url "https://maven.fabricmc.net/" }
 }
 
 dependencies {
